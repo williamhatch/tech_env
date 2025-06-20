@@ -1,40 +1,129 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-运行单元测试的自动化脚本
+Automated script for running unit tests
 """
 
 import os
 import sys
 import subprocess
+import re
 
+# ANSI color codes
+COLORS = {
+    'GREEN': '\033[32m',
+    'YELLOW': '\033[33m',
+    'RED': '\033[31m',
+    'BLUE': '\033[34m',
+    'CYAN': '\033[36m',
+    'MAGENTA': '\033[35m',
+    'RESET': '\033[0m'
+}
+
+def colorize(text, color):
+    """
+    Add color to the given text
+    
+    Args:
+        text: Text to colorize
+        color: Color to use from COLORS dict
+    
+    Returns:
+        Colorized text string
+    """
+    return f"{COLORS[color]}{text}{COLORS['RESET']}"
+
+def colorize_test_output(line):
+    """
+    Colorize pytest output lines
+    
+    Args:
+        line: A line of pytest output
+    
+    Returns:
+        Colorized line
+    """
+    # Colorize test summary line
+    if re.search(r'\d+ passed', line):
+        line = re.sub(r'(\d+ passed)', f"{COLORS['GREEN']}\\1{COLORS['RESET']}", line)
+    
+    if re.search(r'\d+ failed', line):
+        line = re.sub(r'(\d+ failed)', f"{COLORS['YELLOW']}\\1{COLORS['RESET']}", line)
+        
+    if re.search(r'\d+ error', line):
+        line = re.sub(r'(\d+ error)', f"{COLORS['RED']}\\1{COLORS['RESET']}", line)
+        
+    if re.search(r'\d+ skipped', line):
+        line = re.sub(r'(\d+ skipped)', f"{COLORS['BLUE']}\\1{COLORS['RESET']}", line)
+    
+    return line
 
 def run_tests(coverage=True):
     """
-    运行测试并可选地生成覆盖率报告
+    Run tests and optionally generate coverage report
     
     Args:
-        coverage: 是否生成覆盖率报告
+        coverage: Whether to generate coverage report
     """
-    print("正在运行测试...")
+    print(colorize("\n" + "="*50, 'CYAN'))
+    print(colorize("RUNNING TESTS".center(50), 'CYAN'))
+    print(colorize("="*50 + "\n", 'CYAN'))
+    
+    print(colorize("Running tests...", 'GREEN'))
     
     cmd = ["pytest", "-v"]
     if coverage:
-        cmd.extend(["--cov=src", "--cov-report", "term"])
+        cmd.extend(["--cov=src", "--cov-report", "term", "--cov-report", "html"])
     
-    result = subprocess.run(cmd)
-    return result.returncode
+    # Use Popen to capture and colorize output in real-time
+    process = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+        bufsize=1
+    )
+    
+    # Process and colorize output
+    for line in process.stdout:
+        sys.stdout.write(colorize_test_output(line))
+    
+    process.wait()
+    
+    # Show coverage report location if enabled
+    if coverage and process.returncode == 0:
+        print(colorize("\n" + "="*50, 'CYAN'))
+        print(colorize("COVERAGE REPORT".center(50), 'CYAN'))
+        print(colorize("="*50, 'CYAN'))
+        
+        coverage_dir = os.path.join(os.getcwd(), 'htmlcov')
+        if os.path.exists(coverage_dir):
+            index_file = os.path.join(coverage_dir, 'index.html')
+            if os.path.exists(index_file):
+                print(colorize("\nCoverage report generated at: ", 'BLUE') + 
+                      colorize("htmlcov/index.html", 'GREEN'))
+                print(colorize("Open with: ", 'BLUE') + 
+                      colorize("open htmlcov/index.html", 'GREEN') + "\n")
+            else:
+                print(colorize("\nCoverage directory exists but no index.html found.", 'YELLOW'))
+        else:
+            print(colorize("\nNo coverage directory found. Make sure pytest-cov is configured correctly.", 'YELLOW'))
+    
+    return process.returncode
 
 
 if __name__ == "__main__":
-    # 切换到项目根目录
+    # Change to project root directory
     os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     
-    # 解析命令行参数
+    # Parse command line arguments
     coverage = True
     if len(sys.argv) > 1 and sys.argv[1] == "--no-coverage":
         coverage = False
+        print(colorize("Running tests without coverage report", 'BLUE'))
+    else:
+        print(colorize("Running tests with coverage report", 'BLUE'))
     
-    # 运行测试
+    # Run tests
     exit_code = run_tests(coverage)
     sys.exit(exit_code)

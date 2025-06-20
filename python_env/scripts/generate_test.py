@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-自动生成测试模板的脚本
+Script for automatically generating test templates
 """
 
 import os
@@ -10,58 +10,88 @@ import inspect
 import importlib
 from pathlib import Path
 
+# ANSI color codes
+COLORS = {
+    'GREEN': '\033[32m',
+    'YELLOW': '\033[33m',
+    'RED': '\033[31m',
+    'BLUE': '\033[34m',
+    'CYAN': '\033[36m',
+    'MAGENTA': '\033[35m',
+    'RESET': '\033[0m'
+}
+
+def colorize(text, color):
+    """
+    Add color to the given text
+    
+    Args:
+        text: Text to colorize
+        color: Color to use from COLORS dict
+    
+    Returns:
+        Colorized text string
+    """
+    return f"{COLORS[color]}{text}{COLORS['RESET']}"
+
 
 def generate_test_template(module_name):
     """
-    为指定模块生成测试模板
+    Generate test template for the specified module
     
     Args:
-        module_name: 模块名称，例如 'calculator' 或 'src.calculator'
+        module_name: Module name, e.g. 'calculator' or 'src.calculator'
     
     Returns:
-        bool: 是否成功生成测试
+        bool: Whether the test was successfully generated
     """
+    print(colorize("\n" + "="*50, 'CYAN'))
+    print(colorize("GENERATE TEST".center(50), 'CYAN'))
+    print(colorize("="*50 + "\n", 'CYAN'))
+    
     try:
-        # 如果没有提供完整路径，假设它在src目录中
+        # If no full path provided, assume it's in the src directory
         if '.' not in module_name:
             module_name = f"src.{module_name}"
         
-        # 尝试导入模块
+        print(colorize(f"Generating test template for module {module_name}...", 'GREEN'))
+        
+        # Try to import the module
         module = importlib.import_module(module_name)
         
-        # 获取模块中的所有类
+        # Get all classes in the module
         classes = inspect.getmembers(module, inspect.isclass)
         
         if not classes:
-            print(f"警告: 在模块 {module_name} 中没有找到类")
+            print(colorize(f"Warning: No classes found in module {module_name}", 'YELLOW'))
             return False
         
-        # 为每个类生成测试文件
+        # Generate test file for each class
         for class_name, class_obj in classes:
-            # 跳过导入的类
+            # Skip imported classes
             if class_obj.__module__ != module.__name__:
                 continue
             
-            # 确定测试文件路径
+            # Determine test file path
             test_file_name = f"test_{module_name.split('.')[-1]}_{class_name.lower()}.py"
             test_file_path = Path("tests") / test_file_name
             
-            # 如果测试文件已存在，询问是否覆盖
+            # If test file already exists, ask whether to overwrite
             if test_file_path.exists():
-                print(f"测试文件 {test_file_path} 已存在。")
-                choice = input("是否覆盖? (y/n): ").strip().lower()
+                print(colorize(f"Test file {test_file_path} already exists.", 'YELLOW'))
+                choice = input(colorize("Overwrite? (y/n): ", 'YELLOW')).strip().lower()
                 if choice != 'y':
                     continue
             
-            # 获取类的所有方法
+            # Get all methods of the class
             methods = inspect.getmembers(class_obj, inspect.isfunction)
             
-            # 生成测试类内容
+            # Generate test class content
             test_content = [
                 f"#!/usr/bin/env python",
                 f"# -*- coding: utf-8 -*-",
                 f"\"\"\"",
-                f"测试 {module_name}.{class_name} 类",
+                f"Tests for {module_name}.{class_name} class",
                 f"\"\"\"",
                 f"",
                 f"import unittest",
@@ -70,168 +100,170 @@ def generate_test_template(module_name):
                 f"",
                 f"class Test{class_name}(unittest.TestCase):",
                 f"    \"\"\"",
-                f"    测试 {class_name} 类的功能",
+                f"    Tests for the functionality of {class_name} class",
                 f"    \"\"\"",
                 f"",
                 f"    def setUp(self):",
                 f"        \"\"\"",
-                f"        每个测试方法执行前的设置",
+                f"        Setup before each test method",
                 f"        \"\"\"",
                 f"        self.instance = {class_name}()",
                 f"",
             ]
             
-            # 为每个方法生成测试方法
+            # Generate test methods for each method
             for method_name, method_obj in methods:
-                # 跳过私有方法和特殊方法
+                # Skip private methods and special methods
                 if method_name.startswith('_'):
                     continue
                 
                 test_content.extend([
                     f"    def test_{method_name}(self):",
                     f"        \"\"\"",
-                    f"        测试 {method_name} 方法",
+                    f"        Test the {method_name} method",
                     f"        \"\"\"",
-                    f"        # TODO: 实现测试用例",
-                    f"        self.assertTrue(True)  # 替换为实际测试",
+                    f"        # TODO: Implement test cases",
+                    f"        self.assertTrue(True)  # Replace with actual tests",
                     f"",
                 ])
             
-            # 添加main函数
+            # Add main function
             test_content.extend([
                 f"",
                 f"if __name__ == '__main__':",
                 f"    unittest.main()",
             ])
             
-            # 写入测试文件
+            # Write test file
             with open(test_file_path, 'w', encoding='utf-8') as f:
                 f.write('\n'.join(test_content))
             
-            print(f"已生成测试文件: {test_file_path}")
+            print(colorize(f"Generated test file: {test_file_path}", 'GREEN'))
         
         return True
     
     except ImportError:
-        print(f"错误: 无法导入模块 {module_name}")
-        print("请确保模块存在并且可以被导入")
+        print(colorize(f"Error: Could not import module {module_name}", 'RED'))
+        print(colorize("Make sure the module exists and can be imported", 'YELLOW'))
         return False
     
     except Exception as e:
-        print(f"生成测试模板时发生错误: {e}")
+        print(colorize(f"Error occurred while generating test template: {e}", 'RED'))
         return False
 
 
 def create_example_module():
     """
-    创建示例模块，用于演示
+    Create an example module for demonstration
     """
     src_dir = Path("src")
     if not src_dir.exists():
         src_dir.mkdir(parents=True, exist_ok=True)
+        print(colorize(f"Created directory: {src_dir}", 'MAGENTA'))
     
-    # 创建__init__.py
+    # Create __init__.py
     init_file = src_dir / "__init__.py"
     if not init_file.exists():
         init_file.touch()
+        print(colorize(f"Created file: {init_file}", 'BLUE'))
     
-    # 创建示例模块
+    # Create example module
     example_file = src_dir / "calculator.py"
     
     example_content = [
         "#!/usr/bin/env python",
         "# -*- coding: utf-8 -*-",
         "\"\"\"",
-        "简单计算器模块示例",
+        "Simple calculator module example",
         "\"\"\"",
         "",
         "",
         "class Calculator:",
         "    \"\"\"",
-        "    实现基本数学运算的计算器类",
+        "    Calculator class implementing basic mathematical operations",
         "    \"\"\"",
         "",
         "    def add(self, a, b):",
         "        \"\"\"",
-        "        计算两个数的和",
+        "        Calculate the sum of two numbers",
         "        ",
         "        Args:",
-        "            a: 第一个数",
-        "            b: 第二个数",
+        "            a: First number",
+        "            b: Second number",
         "        ",
         "        Returns:",
-        "            两个数的和",
+        "            Sum of the two numbers",
         "        \"\"\"",
         "        return a + b",
         "",
         "    def subtract(self, a, b):",
         "        \"\"\"",
-        "        计算两个数的差",
+        "        Calculate the difference between two numbers",
         "        ",
         "        Args:",
-        "            a: 第一个数",
-        "            b: 第二个数",
+        "            a: First number",
+        "            b: Second number",
         "        ",
         "        Returns:",
-        "            两个数的差",
+        "            Difference between the two numbers",
         "        \"\"\"",
         "        return a - b",
         "",
         "    def multiply(self, a, b):",
         "        \"\"\"",
-        "        计算两个数的乘积",
+        "        Calculate the product of two numbers",
         "        ",
         "        Args:",
-        "            a: 第一个数",
-        "            b: 第二个数",
+        "            a: First number",
+        "            b: Second number",
         "        ",
         "        Returns:",
-        "            两个数的乘积",
+        "            Product of the two numbers",
         "        \"\"\"",
         "        return a * b",
         "",
         "    def divide(self, a, b):",
         "        \"\"\"",
-        "        计算两个数的商",
+        "        Calculate the quotient of two numbers",
         "        ",
         "        Args:",
-        "            a: 第一个数",
-        "            b: 第二个数",
+        "            a: First number",
+        "            b: Second number",
         "        ",
         "        Returns:",
-        "            两个数的商",
+        "            Quotient of the two numbers",
         "        ",
         "        Raises:",
-        "            ZeroDivisionError: 当除数为零时抛出",
+        "            ZeroDivisionError: When the divisor is zero",
         "        \"\"\"",
         "        if b == 0:",
-        "            raise ZeroDivisionError(\"除数不能为零\")",
+        "            raise ZeroDivisionError(\"Divisor cannot be zero\")",
         "        return a / b",
     ]
     
     with open(example_file, 'w', encoding='utf-8') as f:
         f.write('\n'.join(example_content))
     
-    print(f"已创建示例模块: {example_file}")
+    print(colorize(f"Created example module: {example_file}", 'GREEN'))
 
 
 if __name__ == "__main__":
-    # 切换到项目根目录
+    # Change to project root directory
     os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     
-    # 如果没有提供模块名称，显示使用说明
+    # If no module name provided, show usage instructions
     if len(sys.argv) < 2:
-        print("使用方法: python generate_test.py <module_name>")
-        print("示例: python generate_test.py calculator")
-        print("\n创建示例模块...")
+        print(colorize("Usage: python generate_test.py <module_name>", 'YELLOW'))
+        print(colorize("Example: python generate_test.py calculator", 'BLUE'))
+        print(colorize("\nCreating example module...", 'MAGENTA'))
         create_example_module()
         sys.exit(1)
     
-    # 生成测试模板
+    # Generate test template
     module_name = sys.argv[1]
     success = generate_test_template(module_name)
     
     if success:
-        print(f"已成功为模块 {module_name} 生成测试模板")
+        print(colorize(f"\nSuccessfully generated test template for module {module_name}", 'GREEN'))
     else:
-        print(f"为模块 {module_name} 生成测试模板失败")
+        print(colorize(f"\nFailed to generate test template for module {module_name}", 'RED'))

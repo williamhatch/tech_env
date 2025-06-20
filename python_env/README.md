@@ -1,39 +1,69 @@
-# Python 技术面试环境
+# Python Technical Interview Environment
 
-这个环境为您提供了使用Python进行技术面试的完整设置，包括自动化测试和监视工具。
+This environment provides a complete setup for technical interviews using Python, including automated testing, monitoring tools, and a web application framework.
 
-## 环境设置
+## Environment Setup
 
-1. 安装依赖：
+1. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-2. 项目结构：
-   - `src/`: 放置您的源代码
-   - `tests/`: 放置测试用例
-   - `scripts/`: 自动化脚本
+2. Project structure:
+   - `src/`: Place your source code here
+   - `tests/`: Place test cases here
+   - `scripts/`: Automation scripts
 
-## 使用自动化脚本
+## Using Automation Scripts
 
-### 运行测试
+### Run Tests
 ```bash
 python scripts/run_tests.py
 ```
 
-### 监视文件变化并自动运行测试
+### Watch File Changes and Run Tests Automatically
 ```bash
 python scripts/watch_tests.py
 ```
 
-### 生成测试模板
+### Generate Test Template
 ```bash
 python scripts/generate_test.py <module_name>
 ```
 
-## 技术面试提示
+## Web Application (FastAPI)
 
-1. 使用TDD（测试驱动开发）方法
-2. 先编写测试用例，再实现功能
-3. 保持代码简洁清晰
-4. 注意边界条件和异常处理
+### Run Web Server
+```bash
+python scripts/run_api.py
+```
+
+The API will be available at http://127.0.0.1:8000
+
+### API Documentation
+FastAPI automatically generates interactive API documentation:
+- Swagger UI: http://127.0.0.1:8000/docs
+- ReDoc: http://127.0.0.1:8000/redoc
+
+### API Endpoints
+- `GET /`: Welcome message
+- `GET /items/`: List all items
+- `GET /items/{item_id}`: Get item by ID
+- `POST /items/`: Create a new item
+- `DELETE /items/{item_id}`: Delete an item
+
+## Database (SQLAlchemy)
+
+This environment uses SQLite with SQLAlchemy ORM:
+
+- Database configuration: `src/database.py`
+- Models: `src/models.py`
+- Database file: `interview.db` (created automatically)
+
+## Technical Interview Tips
+
+1. Use TDD (Test-Driven Development) approach
+2. Write test cases before implementing features
+3. Keep code clean and concise
+4. Pay attention to edge cases and exception handling
+5. Consider performance implications of your solution
