@@ -1,0 +1,11 @@
+# 监视Ruby文件的变化
+guard :minitest do
+  # 监视lib目录中的所有.rb文件
+  watch(%r{^lib/(.+)\.rb$}) { |m| "test/test_#{m[1]}.rb" }
+  
+  # 监视test目录中的所有测试文件
+  watch(%r{^test/test_(.+)\.rb$})
+  
+  # 监视test_helper.rb
+  watch(%r{^test/test_helper\.rb$}) { 'test' }
+end
