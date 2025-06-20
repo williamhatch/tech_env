@@ -58,6 +58,34 @@ def colorize_test_output(line):
     
     return line
 
+def check_dependencies():
+    """
+    Check if required dependencies are installed
+    
+    Returns:
+        dict: Dictionary with dependency status
+    """
+    dependencies = {
+        'pytest-cov': False,
+        'fastapi': False,
+    }
+    
+    # Check pytest-cov
+    try:
+        import pytest_cov
+        dependencies['pytest-cov'] = True
+    except ImportError:
+        pass
+    
+    # Check fastapi
+    try:
+        import fastapi
+        dependencies['fastapi'] = True
+    except ImportError:
+        pass
+        
+    return dependencies
+
 def run_tests(coverage=True):
     """
     Run tests and optionally generate coverage report
@@ -72,8 +100,24 @@ def run_tests(coverage=True):
     print(colorize("Running tests...", 'GREEN'))
     
     cmd = ["pytest", "-v"]
-    if coverage:
+    
+    # Check dependencies
+    deps = check_dependencies()
+    missing_deps = [dep for dep, installed in deps.items() if not installed]
+    
+    # Only add coverage options if pytest-cov is installed
+    if coverage and deps['pytest-cov']:
         cmd.extend(["--cov=src", "--cov-report", "term", "--cov-report", "html"])
+    elif coverage:
+        print(colorize("\nWarning: pytest-cov is not installed. Running tests without coverage.", 'YELLOW'))
+        print(colorize("To install pytest-cov, run: pip install pytest-cov\n", 'YELLOW'))
+    
+    # Show warnings for missing dependencies
+    if missing_deps:
+        print(colorize("\nWarning: Some dependencies are missing:", 'YELLOW'))
+        for dep in missing_deps:
+            print(colorize(f"  - {dep}", 'YELLOW'))
+        print(colorize("\nTo install all dependencies, run: pip install -r requirements.txt\n", 'YELLOW'))
     
     # Use Popen to capture and colorize output in real-time
     process = subprocess.Popen(

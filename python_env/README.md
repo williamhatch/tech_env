@@ -6,7 +6,11 @@ This environment provides a complete setup for technical interviews using Python
 
 1. Install dependencies:
 ```bash
+# 方法 1: 使用 pip 直接安装
 pip install -r requirements.txt
+
+# 方法 2: 使用安装脚本（推荐）
+python scripts/install_dependencies.py
 ```
 
 2. Project structure:
@@ -38,12 +42,19 @@ python scripts/generate_test.py <module_name>
 python scripts/run_api.py
 ```
 
-The API will be available at http://127.0.0.1:8000
+The FastAPI server will start at http://127.0.0.1:8000
 
 ### API Documentation
 FastAPI automatically generates interactive API documentation:
 - Swagger UI: http://127.0.0.1:8000/docs
 - ReDoc: http://127.0.0.1:8000/redoc
+
+## Test Coverage Report
+
+After running tests, a coverage report will be generated. You can view the HTML report with:
+```bash
+open htmlcov/index.html
+```
 
 ### API Endpoints
 - `GET /`: Welcome message

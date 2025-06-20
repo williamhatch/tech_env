@@ -38,6 +38,10 @@ ruby scripts/generate_test.rb <class_name>
 
 ### Setup Database
 ```bash
+# Create database
+bundle exec rake db:create
+
+# Run migrations
 bundle exec rake db:migrate
 ```
 
@@ -55,6 +59,13 @@ The API will be available at http://localhost:4567
 - `POST /items`: Create a new item
 - `PUT /items/:id`: Update an item
 - `DELETE /items/:id`: Delete an item
+
+## Test Coverage Report
+
+After running tests, a coverage report will be generated. You can view the HTML report with:
+```bash
+open coverage/index.html
+```
 
 ## Database (ActiveRecord)
 

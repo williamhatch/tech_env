@@ -45,6 +45,10 @@ python python_env/scripts/run_tests.py
 
 # Watch files and run tests automatically
 python python_env/scripts/watch_tests.py
+
+# Generate test template for a module
+python python_env/scripts/generate_test.py <module_name>
+# Example: python python_env/scripts/generate_test.py calculator
 ```
 
 ### Ruby Environment
@@ -62,6 +66,34 @@ ruby scripts/watch_tests.rb
 
 # Run Sinatra API server
 ruby scripts/run_api.rb
+
+# Generate test template for a class
+ruby scripts/generate_test.rb <class_name>
+# Example: ruby scripts/generate_test.rb Calculator
 ```
 
 For detailed instructions, please refer to the README files in each environment directory.
+
+## Sample Interview Problems
+
+This environment includes several sample interview problems to help you practice:
+
+1. **String Reversal (Easy)** - Implementation of StringUtils.reverse_string method
+2. **Palindrome Detection (Medium)** - Implementation of StringUtils.is_palindrome method that ignores case, spaces, and punctuation
+3. **Longest Common Subsequence (Medium-Hard)** - Implementation of SequenceUtils.longest_common_subsequence method using dynamic programming
+
+Each problem has complete implementations and test cases in both Python and Ruby environments.
+
+## Test Coverage Reports
+
+### Python Coverage Report
+After running tests, view the HTML coverage report at:
+```bash
+open python_env/htmlcov/index.html
+```
+
+### Ruby Coverage Report
+After running tests, view the HTML coverage report at:
+```bash
+open ruby_env/coverage/index.html
+```

@@ -34,22 +34,75 @@ def colorize(text, color):
     """
     return f"{COLORS[color]}{text}{COLORS['RESET']}"
 
-def run_pytest_watch():
+def check_dependencies():
     """
-    Use pytest-watch to monitor file changes and automatically run tests
+    Check if required dependencies are installed
+    
+    Returns:
+        dict: Dictionary with dependency status
+    """
+    dependencies = {
+        'pytest-watch': False,
+        'pytest-cov': False,
+        'fastapi': False,
+    }
+    
+    # Check pytest-watch
+    try:
+        import pytest_watch
+        dependencies['pytest-watch'] = True
+    except ImportError:
+        pass
+    
+    # Check pytest-cov
+    try:
+        import pytest_cov
+        dependencies['pytest-cov'] = True
+    except ImportError:
+        pass
+    
+    # Check fastapi
+    try:
+        import fastapi
+        dependencies['fastapi'] = True
+    except ImportError:
+        pass
+        
+    return dependencies
+
+def run_watcher():
+    """
+    Run the test watcher
     """
     print(colorize("\n" + "="*50, 'CYAN'))
     print(colorize("TEST WATCHER".center(50), 'CYAN'))
     print(colorize("="*50 + "\n", 'CYAN'))
     
     print(colorize("Starting test watcher...", 'GREEN'))
-    print(colorize("Watching for file changes in src and tests directories...", 'BLUE'))
-    print(colorize("Press Ctrl+C to exit", 'YELLOW'))
+    print(colorize("Watching for file changes in src and tests directories...", 'GREEN'))
+    print(colorize("Press Ctrl+C to exit\n", 'YELLOW'))
     
-    # Display coverage report info
-    print(colorize("\n" + "="*50, 'CYAN'))
+    # Check dependencies
+    deps = check_dependencies()
+    missing_deps = [dep for dep, installed in deps.items() if not installed]
+    
+    # Show warnings for missing dependencies
+    if missing_deps:
+        print(colorize("\nWarning: Some dependencies are missing:", 'YELLOW'))
+        for dep in missing_deps:
+            print(colorize(f"  - {dep}", 'YELLOW'))
+        print(colorize("\nTo install all dependencies, run: pip install -r requirements.txt\n", 'YELLOW'))
+        
+        if 'pytest-watch' in missing_deps:
+            print(colorize("\nError: pytest-watch is required to run the watcher.", 'RED'))
+            print(colorize("To install pytest-watch, run: pip install pytest-watch", 'YELLOW'))
+            print(colorize("\nAlternatively, you can run tests once with: python scripts/run_tests.py", 'BLUE'))
+            return
+    
+    print(colorize("="*50, 'CYAN'))
     print(colorize("COVERAGE REPORT INFO".center(50), 'CYAN'))
     print(colorize("="*50, 'CYAN'))
+    
     print(colorize("\nCoverage report will be generated at: ", 'BLUE') + 
           colorize("htmlcov/index.html", 'GREEN'))
     print(colorize("After tests run, open with: ", 'BLUE') + 
@@ -58,9 +111,29 @@ def run_pytest_watch():
     # Use pytest directly with watch mode
     print(colorize("\nRunning tests with pytest and watching for changes...", 'GREEN'))
     
-    # Use python -m pytest_watch to ensure we're using the installed module
-    cmd = ["python", "-m", "pytest_watch", "--clear", "--runner", "pytest -v --cov=src --cov-report term --cov-report html", "src", "tests"]
-    subprocess.run(cmd)
+    # Try multiple possible commands for pytest-watch
+    commands_to_try = [
+        ["ptw", "--clear", "--runner", "pytest -v --cov=src --cov-report term --cov-report html", "src", "tests"],
+        ["pytest-watch", "--clear", "--runner", "pytest -v --cov=src --cov-report term --cov-report html", "src", "tests"],
+        [sys.executable, "-m", "pytest_watch", "--clear", "--runner", "pytest -v --cov=src --cov-report term --cov-report html", "src", "tests"]
+    ]
+    
+    success = False
+    for cmd in commands_to_try:
+        try:
+            print(colorize(f"\nTrying command: {' '.join(cmd)}", 'BLUE'))
+            subprocess.run(cmd, check=True)
+            success = True
+            break
+        except (subprocess.SubprocessError, FileNotFoundError):
+            print(colorize(f"Command failed: {' '.join(cmd)}", 'YELLOW'))
+            continue
+    
+    if not success:
+        print(colorize("\nError: Could not run pytest-watch with any known command.", 'RED'))
+        print(colorize("To install pytest-watch, run: pip install pytest-watch", 'YELLOW'))
+        print(colorize("\nAlternatively, you can run tests once with: python scripts/run_tests.py", 'BLUE'))
+        print(colorize("\nTo find where ptw is installed, run: which ptw", 'CYAN'))
 
 
 def check_directories():
