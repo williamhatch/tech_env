@@ -1,43 +1,44 @@
-# Calculator 类
+# Calculator class
 #
-# 实现基本数学运算的计算器类
+# A calculator class that implements basic mathematical operations
 class Calculator
-  # 初始化方法
+  # Initialize method
   def initialize
-    # 暂无需初始化任何内容
+    # No initialization needed at the moment
   end
   
-  # 计算两个数的和
-  # @param a [Numeric] 第一个数
-  # @param b [Numeric] 第二个数
-  # @return [Numeric] 两个数的和
+  # Calculate the sum of two numbers
+  # @param a [Numeric] First number
+  # @param b [Numeric] Second number
+  # @return [Numeric] Sum of the two numbers
   def add(a, b)
     a + b
   end
   
-  # 计算两个数的差
-  # @param a [Numeric] 第一个数
-  # @param b [Numeric] 第二个数
-  # @return [Numeric] 两个数的差
+  # Calculate the difference between two numbers
+  # @param a [Numeric] First number
+  # @param b [Numeric] Second number
+  # @return [Numeric] Difference between the two numbers
   def subtract(a, b)
     a - b
   end
   
-  # 计算两个数的乘积
-  # @param a [Numeric] 第一个数
-  # @param b [Numeric] 第二个数
-  # @return [Numeric] 两个数的乘积
+  # Calculate the product of two numbers
+  # @param a [Numeric] First number
+  # @param b [Numeric] Second number
+  # @return [Numeric] Product of the two numbers
   def multiply(a, b)
     a * b
   end
   
-  # 计算两个数的商
-  # @param a [Numeric] 第一个数
-  # @param b [Numeric] 第二个数
-  # @return [Numeric] 两个数的商
-  # @raise [ZeroDivisionError] 当除数为零时抛出
+  # Calculate the quotient of two numbers
+  # @param a [Numeric] First number
+  # @param b [Numeric] Second number
+  # @return [Float] Quotient of the two numbers (floating point result)
+  # @raise [ZeroDivisionError] When the divisor is zero
   def divide(a, b)
-    raise ZeroDivisionError, "除数不能为零" if b.zero?
-    a / b
+    raise ZeroDivisionError, "Divisor cannot be zero" if b.zero?
+    # Convert the result to a floating point number to ensure integer division also returns decimal results
+    a.to_f / b
   end
 end

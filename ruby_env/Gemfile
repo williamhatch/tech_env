@@ -1,6 +1,26 @@
 source 'https://rubygems.org'
 
+# Build tools
+gem 'rake', '~> 13.1'
+
+# Testing dependencies
 gem 'minitest', '~> 5.18'
+gem 'minitest-reporters', '~> 1.6'
 gem 'guard', '~> 2.18'
 gem 'guard-minitest', '~> 2.4'
 gem 'simplecov', '~> 0.22', require: false
+gem 'rack-test', '~> 2.1'  # For testing Sinatra applications
+
+# Web framework
+gem 'sinatra', '~> 3.1'
+gem 'sinatra-contrib', '~> 3.1'
+gem 'puma', '~> 6.4'
+
+# HTTP and file handling
+gem 'httparty', '~> 0.21.0'  # For HTTP requests
+# open-uri is part of Ruby standard library
+
+# Database
+gem 'activerecord', '~> 7.1'
+gem 'sqlite3', '~> 1.6'
+gem 'sinatra-activerecord', '~> 2.0'

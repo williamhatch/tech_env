@@ -1,79 +1,110 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 #
-# 自动生成测试模板的脚本
+# Script for automatically generating test templates
 
 require 'fileutils'
 
+# ANSI color codes
+class String
+  def colorize(color_code)
+    "\e[#{color_code}m#{self}\e[0m"
+  end
+
+  def green
+    colorize(32)
+  end
+
+  def yellow
+    colorize(33)
+  end
+
+  def blue
+    colorize(34)
+  end
+
+  def magenta
+    colorize(35)
+  end
+
+  def cyan
+    colorize(36)
+  end
+end
+
 def generate_test_template(class_name)
-  puts "为类 #{class_name} 生成测试模板..."
+  puts "\n#{'='*50}".cyan
+  puts "#{'GENERATE TEST'.center(50)}".cyan
+  puts "#{'='*50}\n".cyan
   
-  # 切换到项目根目录
+  puts "Generating test template for class #{class_name}...".green
+  
+  # Change to project root directory
   project_root = File.expand_path('..', File.dirname(__FILE__))
   Dir.chdir(project_root)
   
-  # 确定源文件和测试文件的路径
+  # Determine paths for source and test files
   file_name = class_name.gsub(/([A-Z])/) { "_#{$1.downcase}" }.sub(/^_/, '')
   source_file = File.join('lib', "#{file_name}.rb")
   test_file = File.join('test', "test_#{file_name}.rb")
   
-  # 检查测试文件是否已存在
+  # Check if test file already exists
   if File.exist?(test_file)
-    print "测试文件 #{test_file} 已存在。是否覆盖? (y/n): "
+    print "Test file #{test_file} already exists. Overwrite? (y/n): ".yellow
     choice = gets.strip.downcase
     return false unless choice == 'y'
   end
   
-  # 如果源文件不存在，创建一个示例源文件
+  # If source file doesn't exist, create an example source file
   unless File.exist?(source_file)
-    # 确保lib目录存在
+    # Ensure lib directory exists
     FileUtils.mkdir_p(File.dirname(source_file))
     
-    # 创建示例源文件
+    # Create example source file
     File.open(source_file, 'w') do |f|
       f.puts <<~RUBY
-        # #{class_name} 类
+        # #{class_name} class
         #
-        # 这是一个示例类，用于演示测试生成
+        # This is an example class for demonstrating test generation
         class #{class_name}
-          # 初始化方法
+          # Initialize method
           def initialize
             @value = 0
           end
           
-          # 设置值
-          # @param value [Numeric] 要设置的值
-          # @return [Numeric] 设置后的值
+          # Set value
+          # @param value [Numeric] Value to set
+          # @return [Numeric] Value after setting
           def set_value(value)
             @value = value
           end
           
-          # 获取值
-          # @return [Numeric] 当前值
+          # Get value
+          # @return [Numeric] Current value
           def get_value
             @value
           end
           
-          # 增加值
-          # @param amount [Numeric] 要增加的数量
-          # @return [Numeric] 增加后的值
+          # Increment value
+          # @param amount [Numeric] Amount to increment
+          # @return [Numeric] Value after incrementing
           def increment(amount = 1)
             @value += amount
           end
           
-          # 减少值
-          # @param amount [Numeric] 要减少的数量
-          # @return [Numeric] 减少后的值
+          # Decrement value
+          # @param amount [Numeric] Amount to decrement
+          # @return [Numeric] Value after decrementing
           def decrement(amount = 1)
             @value -= amount
           end
         end
       RUBY
     end
-    puts "创建示例源文件: #{source_file}"
+    puts "Created example source file: #{source_file}".blue
   end
   
-  # 分析源文件以获取方法列表
+  # Analyze source file to get method list
   methods = []
   if File.exist?(source_file)
     File.readlines(source_file).each do |line|
@@ -83,43 +114,43 @@ def generate_test_template(class_name)
     end
   end
   
-  # 如果没有找到方法，添加一些默认方法
+  # If no methods found, add some default methods
   if methods.empty?
     methods = ['initialize', 'set_value', 'get_value', 'increment', 'decrement']
   end
   
-  # 确保test目录存在
+  # Ensure test directory exists
   FileUtils.mkdir_p(File.dirname(test_file))
   
-  # 创建测试文件
+  # Create test file
   File.open(test_file, 'w') do |f|
     f.puts <<~RUBY
       require_relative 'test_helper'
       require '#{file_name}'
       
-      # #{class_name} 类的测试
+      # Tests for the #{class_name} class
       class Test#{class_name} < Minitest::Test
-        # 在每个测试方法执行前设置
+        # Setup before each test method
         def setup
           @instance = #{class_name}.new
         end
         
-        # 在每个测试方法执行后清理
+        # Cleanup after each test method
         def teardown
-          # 在这里进行清理工作
+          # Perform cleanup work here
         end
     RUBY
     
-    # 为每个方法生成测试方法
+    # Generate test methods for each method
     methods.each do |method|
       next if method == 'initialize'
       
       f.puts <<~RUBY
         
-        # 测试 #{method} 方法
+        # Test the #{method} method
         def test_#{method}
-          # TODO: 实现测试用例
-          assert(true)  # 替换为实际测试
+          # TODO: Implement test cases
+          assert(true)  # Replace with actual tests
         end
       RUBY
     end
@@ -127,33 +158,33 @@ def generate_test_template(class_name)
     f.puts "end"
   end
   
-  puts "已生成测试文件: #{test_file}"
+  puts "Generated test file: #{test_file}".green
   true
 end
 
 def create_example_class
-  # 创建一个示例类，用于演示
+  # Create an example class for demonstration
   generate_test_template('Calculator')
 end
 
 if __FILE__ == $PROGRAM_NAME
-  # 如果没有提供类名，显示使用说明
+  # If no class name provided, show usage instructions
   if ARGV.empty?
-    puts "使用方法: ruby generate_test.rb <class_name>"
-    puts "示例: ruby generate_test.rb Calculator"
-    puts "\n创建示例类..."
+    puts "Usage: ruby generate_test.rb <class_name>".yellow
+    puts "Example: ruby generate_test.rb Calculator".blue
+    puts "\nCreating example class...".magenta
     create_example_class
     exit 1
   end
   
-  # 生成测试模板
+  # Generate test template
   class_name = ARGV[0]
   success = generate_test_template(class_name)
   
   if success
-    puts "已成功为类 #{class_name} 生成测试模板"
+    puts "\nSuccessfully generated test template for class #{class_name}".green
   else
-    puts "为类 #{class_name} 生成测试模板失败"
+    puts "\nFailed to generate test template for class #{class_name}".red
     exit 1
   end
 end

@@ -1,0 +1,2 @@
+# Logfile created on 2025-06-20 21:59:32 +1200 by logger.rb/v1.7.0
+I, [2025-06-20T21:59:32.993732 #48084]  INFO -- : Test database setup complete with in-memory SQLite database

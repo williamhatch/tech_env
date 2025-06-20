@@ -1,39 +1,73 @@
-# Ruby 技术面试环境
+# Ruby Technical Interview Environment
 
-这个环境为您提供了使用Ruby进行技术面试的完整设置，包括自动化测试和监视工具。
+This environment provides a complete setup for technical interviews using Ruby, including automated testing, monitoring tools, and a web application framework.
 
-## 环境设置
+## Environment Setup
 
-1. 安装依赖：
+1. Install dependencies:
 ```bash
 bundle install
 ```
 
-2. 项目结构：
-   - `lib/`: 放置您的源代码
-   - `test/`: 放置测试用例
-   - `scripts/`: 自动化脚本
+2. Project structure:
+   - `lib/`: Place your source code here
+   - `test/`: Place test cases here
+   - `scripts/`: Automation scripts
+   - `db/`: Database migrations and data
+   - `views/`: Sinatra view templates
+   - `public/`: Static assets
 
-## 使用自动化脚本
+## Using Automation Scripts
 
-### 运行测试
+### Run Tests
 ```bash
 ruby scripts/run_tests.rb
 ```
 
-### 监视文件变化并自动运行测试
+### Watch File Changes and Run Tests Automatically
 ```bash
 ruby scripts/watch_tests.rb
 ```
 
-### 生成测试模板
+### Generate Test Template
 ```bash
 ruby scripts/generate_test.rb <class_name>
 ```
 
-## 技术面试提示
+## Web Application (Sinatra)
 
-1. 使用TDD（测试驱动开发）方法
-2. 先编写测试用例，再实现功能
-3. 保持代码简洁清晰
-4. 注意边界条件和异常处理
+### Setup Database
+```bash
+bundle exec rake db:migrate
+```
+
+### Run Web Server
+```bash
+ruby scripts/run_api.rb
+```
+
+The API will be available at http://localhost:4567
+
+### API Endpoints
+- `GET /`: Welcome message
+- `GET /items`: List all items
+- `GET /items/:id`: Get item by ID
+- `POST /items`: Create a new item
+- `PUT /items/:id`: Update an item
+- `DELETE /items/:id`: Delete an item
+
+## Database (ActiveRecord)
+
+This environment uses SQLite with ActiveRecord ORM:
+
+- Configuration: `config/database.yml`
+- Migrations: `db/migrate/`
+- Models: Defined in `app.rb`
+
+## Technical Interview Tips
+
+1. Use TDD (Test-Driven Development) approach
+2. Write test cases before implementing features
+3. Keep code clean and concise
+4. Pay attention to edge cases and exception handling
+5. Consider performance implications of your solution
