@@ -67,6 +67,64 @@ After running tests, a coverage report will be generated. You can view the HTML 
 open coverage/index.html
 ```
 
+## Debugging Tools
+
+This environment provides various debugging tools and helper functions to assist with rapid code debugging:
+
+### Using Built-in Debug Helper Module
+
+```ruby
+# Import debug helper module
+require_relative 'lib/debug_helper'
+include DebugHelper
+
+# Print debugging environment info
+debug_info
+
+# Insert a breakpoint in the code
+def example_method
+  x = [1, 2, 3]
+  debug_break  # Code execution will pause here
+  y = x.sum
+  return y
+end
+
+# Trace method execution
+trace_method(:calculate_sum) do |a, b|
+  result = a + b
+  return result
+end
+
+# Print detailed variable information
+data = {"name" => "test", "value" => 42}
+print_var(data, "data")
+```
+
+### Recommended Debugging Tools
+
+1. **pry** - Interactive Ruby debugger
+   ```ruby
+   # Add to Gemfile
+gem 'pry'
+gem 'pry-byebug'  # Integrates byebug functionality
+   ```
+
+2. **byebug** - Lightweight Ruby debugger
+   ```ruby
+   # Add to Gemfile
+gem 'byebug'
+   ```
+
+3. **ruby-debug-ide** - VS Code integration
+   ```ruby
+   # Add to Gemfile
+gem 'ruby-debug-ide'
+gem 'debase'
+   ```
+   - Open project in VS Code
+   - Set breakpoints
+   - Press F5 to start debugging
+
 ## Database (ActiveRecord)
 
 This environment uses SQLite with ActiveRecord ORM:

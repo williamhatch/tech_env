@@ -24,3 +24,10 @@ gem 'httparty', '~> 0.21.0'  # For HTTP requests
 gem 'activerecord', '~> 7.1'
 gem 'sqlite3', '~> 1.6'
 gem 'sinatra-activerecord', '~> 2.0'
+
+# Debugging tools
+gem 'pry', '~> 0.14.2'
+gem 'byebug', '~> 11.1'
+gem 'pry-byebug', '~> 3.10'
+gem 'ruby-debug-ide', '~> 0.7.3'
+gem 'debase', '~> 0.2.5'

@@ -6,10 +6,10 @@ This environment provides a complete setup for technical interviews using Python
 
 1. Install dependencies:
 ```bash
-# 方法 1: 使用 pip 直接安装
+# Method 1: Install directly with pip
 pip install -r requirements.txt
 
-# 方法 2: 使用安装脚本（推荐）
+# Method 2: Use installation script (recommended)
 python scripts/install_dependencies.py
 ```
 
@@ -55,6 +55,54 @@ After running tests, a coverage report will be generated. You can view the HTML 
 ```bash
 open htmlcov/index.html
 ```
+
+## Debugging Tools
+
+This environment provides various debugging tools and helper functions to assist with rapid code debugging:
+
+### Using Built-in Debug Helper Module
+
+```python
+# Import debug helper module
+from scripts.debug_helper import debug_break, trace_function, print_var, debug_info
+
+# Print debugging environment info
+debug_info()
+
+# Insert a breakpoint in the code
+def example_function():
+    x = [1, 2, 3]
+    debug_break()  # Code execution will pause here
+    y = sum(x)
+    return y
+
+# Trace function execution
+@trace_function
+def calculate_sum(a, b):
+    result = a + b
+    return result
+
+# Print detailed variable information
+data = {"name": "test", "value": 42}
+print_var(data, "data")
+```
+
+### Recommended Debugging Tools
+
+1. **ipdb/pdb** - Interactive debugger
+   ```bash
+   pip install ipdb
+   ```
+
+2. **PySnooper** - Non-intrusive debugging tool
+   ```bash
+   pip install pysnooper
+   ```
+
+3. **VS Code Debugger** - Graphical interface debugging
+   - Open project in VS Code
+   - Set breakpoints
+   - Press F5 to start debugging
 
 ### API Endpoints
 - `GET /`: Welcome message
